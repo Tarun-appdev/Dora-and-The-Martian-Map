@@ -1,0 +1,24 @@
+{
+  "format": "Float32 little-endian row-major",
+  "width": 2228,
+  "height": 2533,
+  "downsample_factor_xy": [
+    2.0,
+    2.0003947887879985
+  ],
+  "source_resolution_m": 20.0,
+  "grid_resolution_m": 40.00504917646624,
+  "x0_east_m": -25477.541730373974,
+  "y0_north_m": 50100.13187281529,
+  "dx_m": 40.00504917646624,
+  "dy_m": -40.00789577575997,
+  "origin_elevation_m": -2567.35693359375,
+  "origin": {
+    "name": "Perseverance landing site",
+    "latitude_planetocentric_deg": 18.44463,
+    "longitude_east_deg": 77.45089
+  },
+  "crs": "PROJCS[\"Jezero_Crater_Projection\",GEOGCS[\"GCS_Mars_2000_Sphere\",DATUM[\"Mars_2000_(Sphere)\",SPHEROID[\"Mars_2000_Sphere\",3396190,0]],PRIMEM[\"Reference_Meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Equirectangular\"],PARAMETER[\"standard_parallel_1\",18.4663],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+  "vertical_exaggeration": 3.0,
+  "coordinate_frame": "Exact planner SiteFrame ENU metres relative to Perseverance landing site; east positive, north positive"
+}

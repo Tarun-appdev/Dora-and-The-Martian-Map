@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Three.js Test</title>
+  <style>
+    body {
+      margin: 0;
+      background: #1a0c08;
+      color: #3df2c8;
+      font-family: monospace;
+    }
+    #status {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <div id="status">Loading Three.js...</div>
+
+  <script type="module">
+    import * as THREE from './vendor/three.module.js';
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a0c08);
+
+    const camera = new THREE.PerspectiveCamera(
+      70, window.innerWidth / window.innerHeight, 0.1, 100
+    );
+    camera.position.z = 4;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshNormalMaterial();
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    document.getElementById('status').textContent =
+      'SUCCESS: Three.js is working!';
+
+    function animate() {
+      requestAnimationFrame(animate);
+      cube.rotation.x += 0.008;
+      cube.rotation.y += 0.012;
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

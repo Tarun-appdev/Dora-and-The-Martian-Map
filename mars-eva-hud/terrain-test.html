@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jezero 3D Terrain Preview</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #160d09;
+      color: #3df2c8;
+      font-family: monospace;
+    }
+    #view { width: 100vw; height: 100vh; }
+    #info {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 2;
+      padding: 14px;
+      background: rgba(12, 15, 17, .88);
+      border: 1px solid #3df2c8;
+      border-radius: 5px;
+      line-height: 1.8;
+    }
+    #info strong { color: white; }
+    #help {
+      position: fixed;
+      bottom: 15px;
+      left: 16px;
+      color: #ddd;
+      background: rgba(12, 15, 17, .8);
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <strong>JEZERO CRATER // 3D TERRAIN</strong>
+    <div id="status">Loading elevation data...</div>
+  </div>
+  <div id="help">Drag: rotate | Scroll: zoom</div>
+  <div id="view"></div>
+
+  <script type="module">
+    import * as THREE from './vendor/three.module.js';
+    import { createTerrainRenderer }
+      from './terrain-renderer.js';
+
+    const status = document.getElementById('status');
+    const container = document.getElementById('view');
+
+    try {
+      const app = await createTerrainRenderer();
+
+      container.appendChild(app.renderer.domElement);
+
+      const m = app.meta;
+
+      const cx = m.x0_east_m + (m.width - 1) * m.dx_m / 2;
+      const cz = -(m.y0_north_m + (m.height - 1) * m.dy_m / 2);
+
+      const target = new THREE.Vector3(cx, 0, cz);
+
+      app.camera.position.set(cx + 35000, 30000, cz + 50000);
+      app.camera.lookAt(target);
+      app.camera.updateProjectionMatrix();
+
+      const renderer = app.renderer;
+      const camera = app.camera;
+
+      // Basic orbit and zoom controls.
+      let dragging = false;
+      let lastX = 0;
+      let lastY = 0;
+      let angle = Math.atan2(35000, 50000);
+      let distance = 65000;
+      let elevationAngle = 0.55;
+
+      function updateCamera() {
+        const horizontal = distance * Math.cos(elevationAngle);
+
+        camera.position.set(
+          cx + horizontal * Math.sin(angle),
+          distance * Math.sin(elevationAngle),
+          cz + horizontal * Math.cos(angle)
+        );
+
+        camera.lookAt(target);
+      }
+
+      const canvas = renderer.domElement;
+
+      canvas.addEventListener('pointerdown', e => {
+        dragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        canvas.setPointerCapture(e.pointerId);
+      });
+
+      canvas.addEventListener('pointermove', e => {
+        if (!dragging) return;
+
+        angle -= (e.clientX - lastX) * 0.005;
+        elevationAngle = Math.max(
+          0.08,
+          Math.min(1.4, elevationAngle + (e.clientY - lastY) * 0.005)
+        );
+
+        lastX = e.clientX;
+        lastY = e.clientY;
+        updateCamera();
+      });
+
+      canvas.addEventListener('pointerup', () => dragging = false);
+      canvas.addEventListener('pointercancel', () => dragging = false);
+
+      canvas.addEventListener('wheel', e => {
+        distance *= Math.exp(e.deltaY * 0.001);
+        distance = Math.max(10000, Math.min(150000, distance));
+        updateCamera();
+      }, { passive: true });
+
+      updateCamera();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(app.scene, camera);
+      }
+
+      animate();
+
+      status.textContent =
+        `TERRAIN LOADED | ${m.width} × ${m.height} | 40 m GRID`;
+
+      window.addEventListener('beforeunload', () => app.dispose());
+
+    } catch (error) {
+      console.error(error);
+      status.textContent = 'ERROR: ' + error.message;
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from './vendor/three.module.js';
+    window.THREE = THREE;
+  </script>
+</body>
+</html>
